@@ -5,6 +5,7 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from agents import ChatEvaluationAgent
 from langchain_core.messages import AIMessage, HumanMessage
+from speakers import VoiceOverSpeaker
 import random
 
 sons_descriptions = {
@@ -42,7 +43,7 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
 
 template = f"""You are a helpful assistant.
 Your job is to engage the user in a rich, thoughtful conversation that encourages them to reveal as much of their personality as possible. Through open-ended questions and meaningful dialogue, you should aim to uncover the user's beliefs, interests, and behaviors, so that it will be easier to determine their personality type. Approach the conversation with empathy and curiosity, guiding the user to share deeper insights into who they are.
-Never ask the user directly about their personality type. Instead, focus on exploring their thoughts and feelings in a way that naturally leads to self-discovery.
+Never ask the user directly about their personality or interest. Foucus on the subject, and even if they are reluctant to talk about it, ask about the subject from a different angle.
 
 {{chat_history}}
 User: {{user_message}}
@@ -62,13 +63,16 @@ chain_with_history = RunnableWithMessageHistory(
 )
 
 # Function to interact with the chatbot for a specified number of rounds
-def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluationAgent):
+def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluationAgent, speaker: VoiceOverSpeaker = None):
     # Send the first message to kick off the conversation
     random_subject = random.choice(subjects)
     initial_message_content = f"To start, let's talk about {random_subject}. What do you think about this topic?"
 
     # Create an AIMessage object
     initial_message = AIMessage(content=initial_message_content)
+    if speaker:
+        # Use the speaker to vocalize the assistant's response
+        speaker.speak(initial_message_content)
 
     # Display the assistant's first message
     print(f"Assistant: {initial_message_content}")
@@ -100,6 +104,10 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
             config={"configurable": {"session_id": session_id}},
         )
 
+        if speaker:
+            # Use the speaker to vocalize the assistant's response
+            speaker.speak(assistant_response)
+
         # Display the assistant's response
         print(f"Assistant: {assistant_response}")
 
@@ -113,4 +121,5 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
 if __name__ == "__main__":
     n_rounds = 5  # Number of interaction rounds
     evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions)
-    chat_with_bot(MAIN_SESSION_ID, n_rounds, evaluation_agent)
+    speaker = VoiceOverSpeaker()
+    chat_with_bot(MAIN_SESSION_ID, n_rounds, evaluation_agent, speaker=speaker)
