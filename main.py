@@ -28,6 +28,12 @@ subjects = [
     "Why the maror always feels spicier than last year, even though it’s the same",
     "How to explain to your non-Jewish friends why you’re eating bitter herbs and drinking wine at 10 AM"
 ]
+farewell_messages = [
+    "It was a blast chatting with you! Don’t let the maror get you down.",
+    "Thanks for joining the Seder of the mind — see you next Passover!",
+    "May your matzah always be crispy and your charoset sweet. Shalom!",
+    "This concludes your diagnosis — you’re probably a delightful mix of sons. Farewell!"
+]
 
 # Initialize the Ollama LLM with the desired model
 llm = OllamaLLM(model="mistral")
@@ -82,7 +88,7 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
     # Store the first message in session history
     get_session_history(session_id).add_message(initial_message)
 
-    for _ in range(rounds):
+    for i in range(rounds):
         # Wait for the user's input
         user_input = input("You: ")
         if user_input.lower() in ["exit", "quit"]:
@@ -104,10 +110,16 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
         print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
         # Invoke the chain with the user's input (assistant responds)
-        assistant_response = chain_with_history.invoke(
-            {"user_message": user_input},
-            config={"configurable": {"session_id": session_id}},
-        )
+        if i <= rounds - 1:
+            assistant_response = chain_with_history.invoke(
+                {"user_message": user_input},
+                config={"configurable": {"session_id": session_id}},
+            )
+
+        # Append a farewell message if it's the final round
+        else:
+            farewell_message = random.choice(farewell_messages)
+            assistant_response = f"\n\n{farewell_message}"
 
         if speaker:
             # Use the speaker to vocalize the assistant's response
