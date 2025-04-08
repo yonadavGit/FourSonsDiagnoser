@@ -10,6 +10,8 @@ import random
 from tabulate import tabulate
 from trackers import DiagnosisTracker
 import textwrap
+from tqdm import tqdm
+
 
 
 
@@ -73,8 +75,25 @@ chain_with_history = RunnableWithMessageHistory(
     history_messages_key="chat_history",
 )
 
-# Function to interact with the chatbot for a specified number of rounds
-def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluationAgent, speaker: VoiceOverSpeaker = None):
+def get_num_of_rounds_from_user():
+    while True:
+        try:
+            rounds_input = input("How many QnA rounds would you like to have? (or type 'exit' to quit): ")
+            if rounds_input.lower() in ["exit", "quit"]:
+                print("Exiting.")
+                return None
+            rounds = int(rounds_input)
+            if rounds <= 0:
+                print("Please enter a positive number.")
+                continue
+            break
+        except ValueError:
+            print("Please enter a valid number.")
+    return rounds
+
+def chat_with_bot(session_id: str, evaluation_agent: ChatEvaluationAgent, rounds: int =None, speaker: VoiceOverSpeaker = None):
+    if rounds is None:
+        rounds = get_num_of_rounds_from_user()
     diagnosis_tracker = DiagnosisTracker(sons_descriptions)
     # Send the first message to kick off the conversation
     random_subject = random.choice(subjects)
@@ -106,14 +125,16 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
         # Evaluate the user's responses immediately after the input
         table_data = []
         round_data = {}
-
-        for son, description in sons_descriptions.items():
+        scoring_response_progress_bar = tqdm(sons_descriptions.items(), total=len(sons_descriptions),
+                                             desc="Scoring Last Response")
+        for son, description in scoring_response_progress_bar:
             likelihood, explanation = evaluation_agent.evaluate_entity_likelihood(
                 son, get_session_history(session_id).messages
             )
             round_data[son] = {"likelihood": likelihood, "explanation": explanation}
             wrapped_explanation = "\n".join(textwrap.wrap(explanation, width=25))
             table_data.append([son, likelihood, wrapped_explanation])
+        # scoring_response_progress_bar.close()
         diagnosis_tracker.add_round_data(round_data)
         headers = ["Son", "Score", "Explanation"]
         print("\n📊Last Response Score:")
@@ -128,10 +149,9 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
 
         else:
             farewell_message = random.choice(farewell_messages)
-            assistant_response = f"\n\n{farewell_message}"
+            assistant_response = f"{farewell_message}"
 
         if speaker:
-            # Use the speaker to vocalize the assistant's response
             speaker.speak(assistant_response)
 
         # Display the assistant's response
@@ -146,7 +166,7 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
         # print("History:" + str(get_session_history(session_id).messages))
 
 if __name__ == "__main__":
-    n_rounds = 2  # Number of interaction rounds
+    # n_rounds = 2  # Number of interaction rounds
     evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama')
     speaker = VoiceOverSpeaker()
-    chat_with_bot(MAIN_SESSION_ID, n_rounds, evaluation_agent, speaker=speaker)
+    chat_with_bot(MAIN_SESSION_ID, evaluation_agent, speaker=speaker)

@@ -52,15 +52,16 @@ class DiagnosisTracker:
         sorted_distribution = sorted(
             percentage_distribution.items(), key=lambda x: x[1], reverse=True
         )
-        table_data = [
-            [f"{SON_EMOJIS.get(son, '')} {son}", f"{score:.1f}%"]
-            for son, score in sorted_distribution
-        ]
-
         print("\n📊 Final Diagnosis (by Percentage):")
+        # Build table data and bar chart
+        table_data = []
+        for son, likelihood in sorted_distribution:
+            bar = '█' * int(likelihood // 2)  # One block per 2%
+            table_data.append([f"{SON_EMOJIS.get(son, '')} {son}", f"{likelihood:.1f}%", bar])
+
         print(tabulate(
             table_data,
-            headers=["Son", "Likelihood"],
+            headers=["Son", "Likelihood", "Bar"],
             tablefmt="grid"
         ))
 
