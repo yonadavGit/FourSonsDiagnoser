@@ -12,7 +12,7 @@ class ChatEvaluationAgent:
             model_name (str): The name of the chat model to use. Defaults to "llama-2-13b".
         """
         self.entities = entities
-        self.chat_model = OllamaLLM(model="mistral")  # Use ChatOllama instead of ChatOpenAI
+        self.chat_model = OllamaLLM(model=model_name)
 
     def format_chat_history(self, chat_history: List[BaseMessage]) -> str:
         """

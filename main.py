@@ -11,6 +11,7 @@ from tabulate import tabulate
 from trackers import DiagnosisTracker
 import textwrap
 from tqdm import tqdm
+import time
 
 
 
@@ -162,11 +163,11 @@ def chat_with_bot(session_id: str, evaluation_agent: ChatEvaluationAgent, rounds
         get_session_history(session_id).add_message(assistant_message)
 
     diagnosis_tracker.print_summary()
+    time.sleep(5)
 
-        # print("History:" + str(get_session_history(session_id).messages))
 
 if __name__ == "__main__":
     # n_rounds = 2  # Number of interaction rounds
-    evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama')
+    evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama3.2')
     speaker = VoiceOverSpeaker()
     chat_with_bot(MAIN_SESSION_ID, evaluation_agent, speaker=speaker)
