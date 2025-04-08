@@ -111,11 +111,11 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
             likelihood, explanation = evaluation_agent.evaluate_entity_likelihood(
                 son, get_session_history(session_id).messages
             )
-            round_data[son] = {"Score": likelihood, "explanation": explanation}
+            round_data[son] = {"likelihood": likelihood, "explanation": explanation}
             wrapped_explanation = "\n".join(textwrap.wrap(explanation, width=25))
             table_data.append([son, likelihood, wrapped_explanation])
         diagnosis_tracker.add_round_data(round_data)
-        headers = ["Son", "Likelihood", "Explanation"]
+        headers = ["Son", "Score", "Explanation"]
         print("\n📊Last Response Score:")
         print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
