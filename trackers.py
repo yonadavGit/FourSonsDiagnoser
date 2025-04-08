@@ -41,22 +41,28 @@ class DiagnosisTracker:
 
     def print_summary(self):
         final_distribution = self.compute_averages()
+        total = sum(final_distribution.values())
 
-        # Add emoji and sort by likelihood descending
+        # Compute percentages
+        percentage_distribution = {
+            son: (score / total) * 100 for son, score in final_distribution.items()
+        }
+
+        # Add emoji and sort by percentage descending
         sorted_distribution = sorted(
-            final_distribution.items(), key=lambda x: x[1], reverse=True
+            percentage_distribution.items(), key=lambda x: x[1], reverse=True
         )
         table_data = [
-            [f"{SON_EMOJIS.get(son, '')} {son}", round(score, 3)]
+            [f"{SON_EMOJIS.get(son, '')} {son}", f"{score:.1f}%"]
             for son, score in sorted_distribution
         ]
 
-        print("\n📊 Final Averaged Diagnosis:")
+        print("\n📊 Final Diagnosis (by Percentage):")
         print(tabulate(
             table_data,
-            headers=["Son", "Average Likelihood"],
+            headers=["Son", "Likelihood"],
             tablefmt="grid"
         ))
 
         most_likely, score = sorted_distribution[0]
-        print(f"\n🌟 Most likely son type: {SON_EMOJIS.get(most_likely, '')} {most_likely} ({score:.2f})")
+        print(f"\n🌟 Most likely son type: {SON_EMOJIS.get(most_likely, '')} {most_likely} ({score:.1f}%)")

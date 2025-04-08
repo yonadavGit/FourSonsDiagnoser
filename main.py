@@ -111,12 +111,12 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
             likelihood, explanation = evaluation_agent.evaluate_entity_likelihood(
                 son, get_session_history(session_id).messages
             )
-            round_data[son] = {"likelihood": likelihood, "explanation": explanation}
-            wrapped_explanation = "\n".join(textwrap.wrap(explanation, width=100))
+            round_data[son] = {"Score": likelihood, "explanation": explanation}
+            wrapped_explanation = "\n".join(textwrap.wrap(explanation, width=25))
             table_data.append([son, likelihood, wrapped_explanation])
         diagnosis_tracker.add_round_data(round_data)
         headers = ["Son", "Likelihood", "Explanation"]
-        print("\n📊Last Response Rates:")
+        print("\n📊Last Response Score:")
         print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
         # Invoke the chain with the user's input (assistant responds)
@@ -146,7 +146,7 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
         # print("History:" + str(get_session_history(session_id).messages))
 
 if __name__ == "__main__":
-    n_rounds = 4  # Number of interaction rounds
+    n_rounds = 2  # Number of interaction rounds
     evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama')
     speaker = VoiceOverSpeaker()
     chat_with_bot(MAIN_SESSION_ID, n_rounds, evaluation_agent, speaker=speaker)
