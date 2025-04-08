@@ -8,6 +8,9 @@ from langchain_core.messages import AIMessage, HumanMessage
 from speakers import VoiceOverSpeaker
 import random
 from tabulate import tabulate
+from trackers import DiagnosisTracker
+import textwrap
+
 
 
 sons_descriptions = {
@@ -72,6 +75,7 @@ chain_with_history = RunnableWithMessageHistory(
 
 # Function to interact with the chatbot for a specified number of rounds
 def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluationAgent, speaker: VoiceOverSpeaker = None):
+    diagnosis_tracker = DiagnosisTracker(sons_descriptions)
     # Send the first message to kick off the conversation
     random_subject = random.choice(subjects)
     initial_message_content = f"To start, let's talk about {random_subject}. What do you think about this topic?"
@@ -101,22 +105,27 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
 
         # Evaluate the user's responses immediately after the input
         table_data = []
+        round_data = {}
+
         for son, description in sons_descriptions.items():
             likelihood, explanation = evaluation_agent.evaluate_entity_likelihood(
                 son, get_session_history(session_id).messages
             )
-            table_data.append([son, likelihood, explanation])
+            round_data[son] = {"likelihood": likelihood, "explanation": explanation}
+            wrapped_explanation = "\n".join(textwrap.wrap(explanation, width=100))
+            table_data.append([son, likelihood, wrapped_explanation])
+        diagnosis_tracker.add_round_data(round_data)
         headers = ["Son", "Likelihood", "Explanation"]
+        print("\n📊Last Response Rates:")
         print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
         # Invoke the chain with the user's input (assistant responds)
-        if i <= rounds - 1:
+        if i < rounds - 1:
             assistant_response = chain_with_history.invoke(
                 {"user_message": user_input},
                 config={"configurable": {"session_id": session_id}},
             )
 
-        # Append a farewell message if it's the final round
         else:
             farewell_message = random.choice(farewell_messages)
             assistant_response = f"\n\n{farewell_message}"
@@ -132,11 +141,12 @@ def chat_with_bot(session_id: str, rounds: int, evaluation_agent: ChatEvaluation
         assistant_message = AIMessage(content=assistant_response)
         get_session_history(session_id).add_message(assistant_message)
 
+    diagnosis_tracker.print_summary()
 
         # print("History:" + str(get_session_history(session_id).messages))
 
 if __name__ == "__main__":
-    n_rounds = 5  # Number of interaction rounds
-    evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions)
+    n_rounds = 4  # Number of interaction rounds
+    evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama')
     speaker = VoiceOverSpeaker()
     chat_with_bot(MAIN_SESSION_ID, n_rounds, evaluation_agent, speaker=speaker)
