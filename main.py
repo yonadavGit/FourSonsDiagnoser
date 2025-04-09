@@ -13,14 +13,14 @@ import textwrap
 from tqdm import tqdm
 import time
 
-
-
-
 sons_descriptions = {
-    "wise_son": "The Wise Son is deeply engaged with the intellectual aspects of tradition. He approaches the Seder with a thirst for knowledge, seeking to understand the underlying principles and philosophies of the rituals. His questions are thoughtful and reflect a genuine desire to connect with the deeper meanings of the commandments.",
-    "wicked_son": "The Wicked Son exhibits a rebellious stance toward tradition, often questioning its relevance or dismissing its importance. His inquiry, 'What does this service mean to you?' suggests a sense of detachment or exclusion from the communal practices.",
-    "simple_son": "The Simple Son approaches the Seder with innocence and straightforwardness. His question, 'What's this?' reflects a sincere curiosity and a desire to understand, albeit without the depth of inquiry seen in the Wise Son. He may appear less sophisticated in his approach but is earnest in his wish to learn.",
-    "son_who_does_not_know_to_ask": "This son is unaware of his own ignorance, lacking the initiative to seek knowledge. His inability to ask questions may stem from unfamiliarity with the traditions, a sense of indifference, or a lack of exposure to the cultural and religious narratives of the community."
+    "wise_son": "The Wise Son responds with respect and clarity, showing consideration for both the question and the person asking it. His answers are thoughtful, direct, and insightful, reflecting a sharp mind and a sincere engagement with the topic at hand.",
+
+    "wicked_son": "The Wicked Son scoffs at the question or twists it with sarcasm. He often responds with cynicism or disdain, revealing strong negative feelings toward tradition and a deliberate effort to distance himself from it.",
+
+    "simple_son": "The Simple Son offers a basic and often off-the-mark response. Lacking intellectual depth, his answers tend to miss the point or show a limited understanding, though there may still be a spark of honest intent behind them.",
+
+    "son_who_does_not_know_to_ask": "This son appears bewildered and unable to articulate a question at all. He struggles to form coherent thoughts, not from malice but from confusion or cognitive limitation, leaving him silent in the face of unfamiliarity."
 }
 subjects = [
     "Why matzah is basically just a cracker on a diet",
@@ -168,6 +168,6 @@ def chat_with_bot(session_id: str, evaluation_agent: ChatEvaluationAgent, rounds
 
 if __name__ == "__main__":
     # n_rounds = 2  # Number of interaction rounds
-    evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama3.2')
+    evaluation_agent = ChatEvaluationAgent(entities=sons_descriptions, model_name='llama3.1')
     speaker = VoiceOverSpeaker()
     chat_with_bot(MAIN_SESSION_ID, evaluation_agent, speaker=speaker)

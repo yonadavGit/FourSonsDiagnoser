@@ -78,7 +78,7 @@ class ChatEvaluationAgent:
             f"Focusing on the user's last response: '{last_user_message}', "
             f"and considering the description of {entity_name}: '{entity_description}', "
             f"how likely is it that the user is {entity_name}?\n"
-            f"Please respond with a  whole number (int) between 0 and 10, followed by a colon ':' and a short explanation."
+            f"Please respond with a  whole number (int) between 0 and 100, followed by a colon ':' and a short explanation."
             f"If you are not sure, tend to respond with lower number\n"
             f"Keep the explanation very short, no more than 25 words.\n"
             f"\nExample format: '3: The user shows a strong indication of being {entity_name}.'"
