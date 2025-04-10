@@ -1,7 +1,7 @@
 
 # FourSonsDiagnoser
 
-FourSonsDiagnoser is a humooristic, Python-based chatbot designed to emulate the Four Sons from the Passover Haggadah: the Wise, the Wicked, the Simple, and the One Who Does Not Know How to Ask. After chatting with the Diagnoser bot for a pre-defined number of QnA rounds, the Diagnoser provides the user with a likelhood estimation of what Haggadah son he most likely is.
+FourSonsDiagnoser is a humooristic, Python-based POC chatbot designed to emulate the Four Sons from the Passover Haggadah: the Wise, the Wicked, the Simple, and the One Who Does Not Know How to Ask. After chatting with the Diagnoser bot for a pre-defined number of QnA rounds, the Diagnoser provides the user with a likelhood estimation of what Haggadah son he most likely is.
 
 
 ## Installation
