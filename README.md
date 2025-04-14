@@ -84,8 +84,8 @@ Follow the on-screen prompts to interact with the different chatbot personalitie
 ## Project Structure
 
 - `main.py`: Entry point for the chatbot interface.
-- `agents.py`: Contains the definitions and behaviors of the Four Sons personas.
-- `speakers.py`: Manages dialogue generation and response formatting.
+- `agents.py`: Contains the implementation of the agent responsible for evaluating the dialogue.
+- `speakers.py`: Contains and object that reads out the text of the dialogue.
 - `trackers.py`: Handles session tracking and message history management.
 - `requirements.txt`: Lists the Python dependencies required for the project.
 
